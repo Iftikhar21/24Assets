@@ -444,7 +444,7 @@ public final class MainView extends Div {
 
         Icon goodsIcon = new Icon(VaadinIcon.PACKAGE);
         goodsIcon.setColor("#7c3aed");
-        Span goodsTitle = new Span("Goods");
+        Span goodsTitle = new Span("Assets");
         goodsTitle.getStyle()
                 .set("color", "#7c3aed")
                 .set("font-weight", "600")
