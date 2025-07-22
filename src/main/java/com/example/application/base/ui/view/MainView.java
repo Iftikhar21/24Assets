@@ -17,6 +17,8 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
@@ -75,7 +77,10 @@ public final class MainView extends Div {
         addClassName("main-view");
         Image logo24Assets = new Image(DownloadHandler.forClassResource(getClass(),"/images/logo24Assets.png"), "Logo 24 Assets");
         logo24Assets.setWidth("auto");
-        logo24Assets.setHeight("32px");
+        logo24Assets.setHeight("28px");
+        logo24Assets.getStyle()
+                .set("padding", "5px")
+                .set("margin-left", "10px");
         ViewToolbar toolbar = new ViewToolbar(logo24Assets); // Gunakan Image sebagai parameter
         add(toolbar);
 
@@ -595,7 +600,7 @@ public final class MainView extends Div {
         card.setPadding(true);
         card.setSpacing(true);
         card.setAlignItems(FlexComponent.Alignment.CENTER);
-        card.setWidth("140px");
+        card.setWidth("200px");
         card.setHeight("auto");
         card.getStyle()
                 .set("border", "1px solid #e9ecef")
@@ -619,14 +624,14 @@ public final class MainView extends Div {
                 .set("font-weight", "600")
                 .set("font-size", "14px")
                 .set("color", "#374151")
-                .set("text-align", "center");
+                .set("text-align", "start");
 
         // Category
         Span categorySpan = new Span("Kategori\n#" + category);
         categorySpan.getStyle()
                 .set("font-size", "10px")
                 .set("color", "#6b7280")
-                .set("text-align", "center")
+                .set("text-align", "start")
                 .set("white-space", "pre-line");
 
         // Status badge
@@ -639,7 +644,7 @@ public final class MainView extends Div {
                 .set("font-size", "10px")
                 .set("margin-top", "auto");
 
-        card.add(imagePlaceholder, nameSpan, categorySpan, statusBadge);
+        card.add(imagePlaceholder, nameSpan, statusBadge, categorySpan);
         return card;
     }
 
@@ -658,10 +663,11 @@ public final class MainView extends Div {
         Span qtyLabel = new Span("Qty");
         qtyLabel.getStyle().set("font-size", "14px");
 
-        ComboBox<Integer> qtyCombo = new ComboBox<>();
-        qtyCombo.setItems(1, 2, 3, 4, 5);
-        qtyCombo.setValue(1);
-        qtyCombo.setWidth("80px");
+        IntegerField qtyCombo = new IntegerField();
+        qtyCombo.setStepButtonsVisible(true);
+        qtyCombo.setRequiredIndicatorVisible(true);
+        qtyCombo.setMin(0);
+        qtyCombo.setWidth("100px");
 
         qtySection.add(qtyLabel, qtyCombo);
 

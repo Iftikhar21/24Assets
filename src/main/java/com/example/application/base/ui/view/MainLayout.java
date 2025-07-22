@@ -7,6 +7,7 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -18,6 +19,7 @@ import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.server.menu.MenuConfiguration;
 import com.vaadin.flow.server.menu.MenuEntry;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.spring.security.AuthenticationContext;
 import jakarta.annotation.security.PermitAll;
 
@@ -39,14 +41,13 @@ public final class MainLayout extends AppLayout {
 
     private Div createHeader() {
         // TODO Replace with real application logo and name
-        var appLogo = VaadinIcon.CUBES.create();
-        appLogo.addClassNames(TextColor.PRIMARY, IconSize.LARGE);
+        Image logo24Assets = new Image(DownloadHandler.forClassResource(getClass(),"/images/logo24Assets.png"), "Logo 24 Assets");
+        logo24Assets.getStyle()
+                .set("padding-top", "50px")
+                .set("height", "48px");
 
-        var appName = new Span("24assets");
-        appName.addClassNames(FontWeight.SEMIBOLD, FontSize.LARGE);
-
-        var header = new Div(appLogo, appName);
-        header.addClassNames(Display.FLEX, Padding.MEDIUM, Gap.MEDIUM, AlignItems.CENTER);
+        var header = new Div(logo24Assets);
+        header.addClassNames(Display.FLEX, JustifyContent.CENTER, AlignItems.CENTER);
         return header;
     }
 

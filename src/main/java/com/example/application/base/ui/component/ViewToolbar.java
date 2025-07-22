@@ -22,6 +22,10 @@ public final class ViewToolbar extends Composite<Header> {
                 AlignItems.STRETCH, Gap.MEDIUM, FlexDirection.Breakpoint.Medium.ROW,
                 AlignItems.Breakpoint.Medium.CENTER);
 
+        getElement().getStyle()
+                .set("padding","5px")
+                .set("background-color", "#ffffff");
+
         var drawerToggle = new DrawerToggle();
         drawerToggle.addClassNames(Margin.NONE);
 
