@@ -22,6 +22,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.AbstractStreamResource;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDateTime;
@@ -72,7 +73,9 @@ public final class MainView extends Div {
 
     public MainView() {
         addClassName("main-view");
-        Image logo24Assets = new Image("resources/images/logo24Assets.png", "Logo 24 Assets");
+        Image logo24Assets = new Image(DownloadHandler.forClassResource(getClass(),"/images/logo24Assets.png"), "Logo 24 Assets");
+        logo24Assets.setWidth("auto");
+        logo24Assets.setHeight("32px");
         ViewToolbar toolbar = new ViewToolbar(logo24Assets); // Gunakan Image sebagai parameter
         add(toolbar);
 
@@ -593,7 +596,7 @@ public final class MainView extends Div {
         card.setSpacing(true);
         card.setAlignItems(FlexComponent.Alignment.CENTER);
         card.setWidth("140px");
-        card.setHeight("160px");
+        card.setHeight("auto");
         card.getStyle()
                 .set("border", "1px solid #e9ecef")
                 .set("border-radius", "8px")
