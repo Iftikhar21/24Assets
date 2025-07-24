@@ -8,6 +8,7 @@ import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
@@ -31,6 +32,7 @@ import static com.vaadin.flow.theme.lumo.LumoUtility.*;
 
 @Layout
 @PermitAll // When security is enabled, allow all authenticated users
+@StyleSheet("context://styles.css")
 @StyleSheet("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@400;500;600;700&display=swap")
 
 public final class MainLayout extends AppLayout {
@@ -42,7 +44,8 @@ public final class MainLayout extends AppLayout {
         this.currentUser = currentUser;
         this.authenticationContext = authenticationContext;
         setPrimarySection(Section.DRAWER);
-        addToDrawer(createHeader(), new Scroller(createSideNav()), createBotttomBtn());
+
+//        addToDrawer(createHeader(), new Scroller(createSideNav()), createBotttomBtn());
     }
 
     private Div createHeader() {
@@ -89,25 +92,17 @@ public final class MainLayout extends AppLayout {
                 .set("background-color", "#6528F7");
 
         exit.add(btnExit);
-//        var user = currentUser.require();
 
-//        var avatar = new Avatar(user.getFullName(), user.getPictureUrl());
-//        avatar.addThemeVariants(AvatarVariant.LUMO_XSMALL);
-//        avatar.addClassNames(Margin.Right.SMALL);
-//        avatar.setColorIndex(5);
-//
-//        var userMenu = new MenuBar();
-//        userMenu.addThemeVariants(MenuBarVariant.LUMO_TERTIARY_INLINE);
-//        userMenu.addClassNames(Margin.MEDIUM);
-//
-//        var userMenuItem = userMenu.addItem(avatar);
-//        userMenuItem.add(user.getFullName());
-//        if (user.getProfileUrl() != null) {
-//            userMenuItem.getSubMenu().addItem("View Profile",
-//                    event -> UI.getCurrent().getPage().open(user.getProfileUrl()));
-//        }
-        // TODO Add additional items to the user menu if needed
-//        userMenuItem.getSubMenu().addItem("Logout", event -> authenticationContext.logout());
+        btnExit.addClickListener(event -> {
+            ConfirmDialog confirmDialog = new ConfirmDialog();
+            confirmDialog.setHeader("Konfirmasi Logout");
+            confirmDialog.setText("Apakah Anda yakin ingin keluar?");
+            confirmDialog.setCancelable(true);
+            confirmDialog.addConfirmListener(e -> {
+                authenticationContext.logout();
+            });
+            confirmDialog.open();
+        });
 
         return exit;
     }

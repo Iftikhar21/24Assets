@@ -1,2 +1,40 @@
-
 @import url("dev-login.css");
+
+.custom-textfield::part(input-field) {
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    color: #000;
+    padding: 6px;
+}
+.custom-button {
+    background-color: #ffffff;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    margin-right: 10px;
+    color: #000;
+    padding: 6px;
+}
+
+.custom-btn-category {
+    background-color: #7DA0DE33;
+    padding: 2px;
+    border-radius 10px;
+}
+
+.product-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.bg-white {
+    background-color: #ffffff;
+}
+
+.white-drawer [part="drawer"] {
+    background-color: white !important;
+}

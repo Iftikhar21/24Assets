@@ -1,10 +1,13 @@
 package com.example.application.base.ui.view;
 
 import com.example.application.base.ui.component.ViewToolbar;
+import com.example.application.controller.ProductsController;
+import com.example.application.model.Products;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
@@ -23,16 +26,18 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.AbstractStreamResource;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @StyleSheet("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@400;500;600;700&display=swap")
 
-@Route("")
+@Route("ordering")
 @PermitAll
 public final class MainView extends Div {
 
@@ -152,8 +157,8 @@ public final class MainView extends Div {
         Span orderingText = new Span("Ordering");
         orderingText.getStyle()
                 .set("color", "#7c3aed")
-                .set("font-weight", "600")
-                .set("font-size", "14px");
+                .set("font-weight", "400")
+                .set("font-size", "16px");
 
         orderingHeader.add(orderIcon, orderingText);
 
@@ -171,6 +176,7 @@ public final class MainView extends Div {
 
         // Name field
         TextField nameField = new TextField("Name");
+        nameField.addClassName("custom-textfield");
         nameField.setWidthFull();
 
         // Row 1: Status, Grade, Class, Location
@@ -182,18 +188,25 @@ public final class MainView extends Div {
         statusCombo.setItems("All", "Available", "In Use", "Returned");
         statusCombo.setValue("All");
         statusCombo.setWidth("125px");
+        statusCombo.addClassName("custom-textfield");
 
         ComboBox<String> gradeCombo = new ComboBox<>("Grade");
         gradeCombo.setItems("A", "B", "C", "D");
+        gradeCombo.setValue("Grade");
         gradeCombo.setWidth("125px");
+        gradeCombo.addClassName("custom-textfield");
 
         ComboBox<String> classCombo = new ComboBox<>("Class");
         classCombo.setItems("Electronics", "Furniture", "Vehicles");
+        classCombo.setValue("Class");
         classCombo.setWidth("125px");
+        classCombo.addClassName("custom-textfield");
 
         ComboBox<String> locationCombo = new ComboBox<>("Location");
         locationCombo.setItems("Room 101", "Room 102", "Storage");
+        locationCombo.setValue("Location");
         locationCombo.setWidth("125px");
+        locationCombo.addClassName("custom-textfield");
 
         row1.add(statusCombo, gradeCombo, classCombo, locationCombo);
 
@@ -206,14 +219,17 @@ public final class MainView extends Div {
         VerticalLayout startDateSection = new VerticalLayout();
         startDateSection.setPadding(false);
         startDateSection.setSpacing(false);
+        startDateSection.addClassName("custom-textfield");
 
         DateTimePicker startDateField = new DateTimePicker();
+        startDateField.addClassName("custom-textfield");
         startDateField.setWidth("250px");
         startDateField.getStyle().set("font-size", "12px");
 
         HorizontalLayout startDateTime = new HorizontalLayout(startDateField);
         startDateTime.setSpacing(true);
         startDateTime.setAlignItems(FlexComponent.Alignment.CENTER);
+        startDateTime.addClassName("custom-textfield");
 
         Icon angleDoubleRight = new Icon(VaadinIcon.ANGLE_DOUBLE_RIGHT);
         angleDoubleRight.setSize("16px");
@@ -224,6 +240,7 @@ public final class MainView extends Div {
         // End date time
         DateTimePicker endDateField = new DateTimePicker();
         endDateField.setWidth("250px");
+        endDateField.addClassName("custom-textfield");
         endDateField.getStyle().set("font-size", "12px");
 
 
@@ -235,6 +252,7 @@ public final class MainView extends Div {
 
         // Note field
         TextArea noteField = new TextArea("Note");
+        noteField.addClassName("custom-textfield");
         noteField.setWidthFull();
 
         formSection.add(orderingHeader, nameField, row1, row2, noteField);
@@ -277,6 +295,7 @@ public final class MainView extends Div {
         // Search field
         TextField historySearch = new TextField();
         historySearch.setPlaceholder("Search goods");
+        historySearch.addClassName("custom-textfield");
         historySearch.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         historySearch.getStyle()
                 .set("margin", "0")
@@ -284,25 +303,16 @@ public final class MainView extends Div {
 
         // Sort Button (with icon and text)
         Icon sortIconDown = new Icon(VaadinIcon.ARROW_LONG_DOWN);
-//        Icon sortIconUp = new Icon(VaadinIcon.ARROWS_LONG_UP);
-//        HorizontalLayout sortIcon = new HorizontalLayout();
-//        sortIcon.add(sortIconDown, sortIconUp);
-//        sortIcon.setSpacing(false);
         Button sortBtn = new Button("Sort by", sortIconDown);
+        sortBtn.addClassName("custom-button");
+        sortBtn.setHeight("50px");
         sortBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        sortBtn.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-20pct)")  // Border seperti pada gambar
-                .set("border-radius", "4px")
-                .set("margin-right", "10px")
-                .set("padding", "0.5em");
 
         // Filter Button (with icon and text)
         Button filterBtn = new Button("Filter", new Icon(VaadinIcon.ALIGN_CENTER));
+        filterBtn.addClassNames("custom-button");
+        filterBtn.setHeight("50px");
         filterBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-        filterBtn.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-20pct)")
-                .set("border-radius", "4px")
-                .set("padding", "0.5em");
 
         // Container untuk semua komponen dalam satu baris
         HorizontalLayout container = new HorizontalLayout();
@@ -447,7 +457,7 @@ public final class MainView extends Div {
         Span goodsTitle = new Span("Assets");
         goodsTitle.getStyle()
                 .set("color", "#7c3aed")
-                .set("font-weight", "600")
+                .set("font-weight", "400")
                 .set("font-size", "16px");
 
         titleSection.add(goodsIcon, goodsTitle);
@@ -466,6 +476,7 @@ public final class MainView extends Div {
         TextField nameSearch = new TextField();
         nameSearch.setWidthFull();
         nameSearch.setPlaceholder("Search goods");
+        nameSearch.addClassName("custom-textfield");
         nameSearch.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
         nameSearch.getStyle()
                 .set("margin", "0");
@@ -485,19 +496,27 @@ public final class MainView extends Div {
                 .set("gap", "8px")
                 .set("padding-top", "10px");
 
-        Button allBtn = createCategoryButton("🔄", "All", true);
-        Button soundBtn = createCategoryButton("🔊", "Sound System", false);
-        Button electronicBtn = createCategoryButton("💻", "Electronic", false);
-        Button keysBtn = createCategoryButton("🔑", "Room keys", false);
-        Button projectorBtn = createCategoryButton("📽️", "Projector", false);
+        Image logoAll = new Image(DownloadHandler.forClassResource(getClass(),"/images/catAll.png"), "Logo All");
+        Image logoSoundSys = new Image(DownloadHandler.forClassResource(getClass(),"/images/catSoundSystem.png"), "Logo Sound System");
+        Image logoElectronics = new Image(DownloadHandler.forClassResource(getClass(),"/images/catElectronic.png"), "Logo Electronic");
+        Image logoRoomKeys = new Image(DownloadHandler.forClassResource(getClass(),"/images/catRoomNames.png"), "Logo Room Keys");
+        Image logoProjector = new Image(DownloadHandler.forClassResource(getClass(),"/images/catProjector.png"), "Logo Projector");
+
+        Button allBtn = createCategoryButton(logoAll, "All", true);
+        Button soundBtn = createCategoryButton(logoSoundSys, "Sound System", false);
+        Button electronicBtn = createCategoryButton(logoElectronics, "Electronic", false);
+        Button keysBtn = createCategoryButton(logoRoomKeys, "Room keys", false);
+        Button projectorBtn = createCategoryButton(logoProjector, "Projector", false);
 
         filters.add(allBtn, soundBtn, electronicBtn, keysBtn, projectorBtn);
         return filters;
     }
 
-    private Button createCategoryButton(String icon, String text, boolean active) {
+    private Button createCategoryButton(Image icon, String text, boolean active) {
         Button btn = new Button();
         btn.setWidth("auto"); // Let buttons size based on content
+        btn.getStyle()
+                .set("cursor", "pointer");
 
         HorizontalLayout content = new HorizontalLayout();
         content.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -544,24 +563,33 @@ public final class MainView extends Div {
                 .set("max-height", "575px") // Set max height for scrollable area
                 .set("margin-bottom", "16px");
 
-        // Category sections
-        VerticalLayout soundSystemSection = createCategorySection("Sound System", Arrays.asList(
-                createProductCard("Speaker", "Audio/Visual", "Available"),
-                createProductCard("Microphone", "Audio/Visual", "Available"),
-                createProductCard("Kabel HDMI", "Audio/Visual", "Available")
-        ));
+        // Get products data from controller
+        ProductsController productsController = new ProductsController();
+        List<Products> allProducts = productsController.getListProducts("");
 
-        VerticalLayout electronicSection = createCategorySection("Electronic", Arrays.asList(
-                createProductCard("Monitor", "Audio/Visual", "Available"),
-                createProductCard("Tab", "Audio/Visual", "Available"),
-                createProductCard("Projector", "Audio/Visual", "Available")
-        ));
+        // Group products by category
+        Map<String, List<Products>> productsByCategory = allProducts.stream()
+                .collect(Collectors.groupingBy(Products::getCategoryName));
 
-        VerticalLayout keysSection = createCategorySection("Keys", Arrays.asList(
-                createProductCard("Room keys", "Keys", "Available")
-        ));
+        // Create sections for each category
+        for (Map.Entry<String, List<Products>> entry : productsByCategory.entrySet()) {
+            String categoryName = entry.getKey();
+            List<Products> categoryProducts = entry.getValue();
 
-        gridSection.add(soundSystemSection, electronicSection, keysSection);
+            // Convert Products to VerticalLayout cards
+            List<VerticalLayout> productCards = categoryProducts.stream()
+                    .map(product -> createProductCard(
+                            product.getProductName(),
+                            product.getCategoryName(),
+                            product.getStock() > 0 ? "Ready" : "Unavailable", // status
+                            product.getStock())) // stock
+                    .collect(Collectors.toList());
+
+            // Create category section
+            VerticalLayout categorySection = createCategorySection(categoryName, productCards);
+            gridSection.add(categorySection);
+        }
+
         return gridSection;
     }
 
@@ -595,58 +623,97 @@ public final class MainView extends Div {
         return section;
     }
 
-    private VerticalLayout createProductCard(String name, String category, String status) {
+    private VerticalLayout createProductCard(String name, String category, String status, int stock) {
         VerticalLayout card = new VerticalLayout();
         card.setPadding(true);
-        card.setSpacing(true);
+        card.setSpacing(false);
         card.setAlignItems(FlexComponent.Alignment.CENTER);
-        card.setWidth("200px");
-        card.setHeight("auto");
+        card.setWidth("250px");
+        card.setHeight("320px");
         card.getStyle()
-                .set("border", "1px solid #e9ecef")
-                .set("border-radius", "8px")
-                .set("background-color", "#fafafa")
                 .set("cursor", "pointer")
-                .set("text-align", "center");
+                .set("border", "2px solid #e9ecef")
+                .set("border-radius", "12px")
+                .set("background-color", "#ffffff")
+                .set("box-shadow", "0 2px 6px rgba(0,0,0,0.04)")
+                .set("position", "relative")
+                .set("transition", "border-color 0.3s ease");
 
-        // Product image placeholder
-        Div imagePlaceholder = new Div();
-        imagePlaceholder.setWidth("60px");
-        imagePlaceholder.setHeight("60px");
-        imagePlaceholder.getStyle()
-                .set("background-color", "#e9ecef")
-                .set("border-radius", "8px")
-                .set("margin-bottom", "8px");
+        // Checkbox pojok kanan bawah
+        Checkbox checkbox = new Checkbox();
+        checkbox.getStyle()
+                .set("position", "absolute")
+                .set("bottom", "12px")
+                .set("right", "12px");
 
-        // Product name
+        // Highlight card saat dicentang
+        checkbox.addValueChangeListener(event -> {
+            if (event.getValue()) {
+                card.getStyle().set("border", "2px solid #8B5CF6"); // warna ungu
+            } else {
+                card.getStyle().set("border", "2px solid #e9ecef"); // default
+            }
+        });
+
+        // Gambar produk
+        Image productImage = new Image(DownloadHandler.forClassResource(getClass(), "/images/speaker.png"), "Product Image");
+        productImage.setWidth("120px");
+        productImage.getStyle().set("margin-bottom", "12px");
+
+        // Nama produk
         Span nameSpan = new Span(name);
         nameSpan.getStyle()
                 .set("font-weight", "600")
-                .set("font-size", "14px")
-                .set("color", "#374151")
-                .set("text-align", "start");
-
-        // Category
-        Span categorySpan = new Span("Kategori\n#" + category);
-        categorySpan.getStyle()
-                .set("font-size", "10px")
-                .set("color", "#6b7280")
-                .set("text-align", "start")
-                .set("white-space", "pre-line");
+                .set("font-size", "16px")
+                .set("color", "#111827")
+                .set("margin-bottom", "4px");
 
         // Status badge
         Span statusBadge = new Span(status);
         statusBadge.getStyle()
-                .set("background-color", "#dbeafe")
-                .set("color", "#1d4ed8")
+                .set("background-color", "#E0E7FF")
+                .set("color", "#6D28D9")
                 .set("padding", "2px 8px")
+                .set("font-size", "12px")
                 .set("border-radius", "12px")
-                .set("font-size", "10px")
-                .set("margin-top", "auto");
+                .set("margin-left", "8px");
 
-        card.add(imagePlaceholder, nameSpan, statusBadge, categorySpan);
+        // Nama produk + status
+        HorizontalLayout nameAndStatus = new HorizontalLayout(nameSpan, statusBadge);
+        nameAndStatus.setSpacing(true);
+        nameAndStatus.setAlignItems(FlexComponent.Alignment.BASELINE);
+
+        // Kategori
+        Span categorySpan = new Span(category);
+        categorySpan.getStyle()
+                .set("font-size", "14px")
+                .set("color", "#6B7280")
+                .set("margin-bottom", "12px");
+
+        // Badge jumlah stok
+        Span stockBadge = new Span(stock + " Products Ready");
+        stockBadge.getStyle()
+                .set("background-color", "#8B5CF6")
+                .set("color", "white")
+                .set("padding", "4px 12px")
+                .set("border-radius", "16px")
+                .set("font-size", "12px")
+                .set("font-weight", "500");
+
+        // Kontainer isi
+        VerticalLayout content = new VerticalLayout(productImage, nameAndStatus, categorySpan, stockBadge);
+        content.setAlignItems(FlexComponent.Alignment.CENTER);
+        content.setSpacing(false);
+        content.setPadding(false);
+
+        card.add(content, checkbox);
+        card.addClickListener(event -> {
+            checkbox.setValue(!checkbox.getValue());
+        });
         return card;
     }
+
+
 
     private HorizontalLayout createBottomSection() {
         HorizontalLayout bottom = new HorizontalLayout();
