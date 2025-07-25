@@ -368,11 +368,24 @@ public final class MainView extends Div {
         }).setHeader("Status").setWidth("80px");
 
         grid.addComponentColumn(asset -> {
-            Button actionBtn = new Button("Continue");
-            actionBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SMALL);
+            Button delete = new Button(new Icon(VaadinIcon.TRASH));
+            delete.addClassName("icon-button");
+            delete.addClickListener(e -> {
+                // aksi delete
+            });
+
+            Button actionBtn = new Button("Extend");
+            actionBtn.addClassName("purple-button");
             actionBtn.getStyle().set("font-size", "10px");
-            return actionBtn;
-        }).setHeader("Action").setWidth("80px");
+
+            HorizontalLayout layout = new HorizontalLayout(delete,actionBtn);
+            layout.setSpacing(true);
+            layout.setPadding(false);
+            layout.setMargin(false);
+            return layout;
+
+        }).setHeader("Action").setWidth("160px").setFlexGrow(0);
+
 
         // Sample data
         List<Asset> assets = Arrays.asList(

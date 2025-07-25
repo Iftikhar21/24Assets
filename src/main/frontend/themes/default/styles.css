@@ -38,3 +38,35 @@
 .white-drawer [part="drawer"] {
     background-color: white !important;
 }
+.purple-button {
+  background-color: #6524F7;
+  color: white;
+  border: none;
+  padding: 8px 24px;
+  border-radius: 12px;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+}
+
+.purple-button:hover {
+  background-color: #4d1dbf;
+}
+.icon-button {
+  background-color: #f5f7fa;
+  border: 1px solid #cbd5e0;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.icon-button vaadin-icon {
+  color: #6524F7;
+  width: 18px;
+  height: 18px;
+}
+
+.icon-button:hover {
+  background-color: #e2e8f0;
+}
+
+css
