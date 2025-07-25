@@ -244,7 +244,7 @@ public class HomeView extends VerticalLayout {
         getStartedBtn.addClickListener(e -> {
             getStartedBtn.getUI().ifPresent(ui -> ui.navigate("ordering"));
         });
-        getStartedBtn.addClassName("get-started-button-blog");
+        getStartedBtn.addClassName("get-started-btn-blog");
 
         contentContainer.add(title, paragraph, getStartedBtn);
         frameUp.add(contentContainer);

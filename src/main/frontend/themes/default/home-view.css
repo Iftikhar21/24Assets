@@ -4,6 +4,10 @@ html, body, .home-view, .home-view * {
     font-family: 'Poppins', sans-serif !important;
 }
 
+.hero-section {
+    padding: 100px;
+}
+
 /* Header Styles */
 .header {
     font-family: 'Poppins' !important;
@@ -84,23 +88,29 @@ html, body, .home-view, .home-view * {
     box-shadow: 0 12px 35px rgba(245, 158, 11, 0.4) !important;
 }
 
+.dashboard-preview {
+    background: white !important;
+}
+
 .blog-frame-up {
     background: linear-gradient(to right, #6526F7, #3B1791) !important;
     border-radius: 15px !important; /* Remove rounded corners */
 }
 
-.get-started-button-blog {
-   gap: 0.5rem !important;
-   background: #fff !important;
-   color: #6528F7;
-   cursor: pointer;
-   border: none !important;
-   border-radius: 5px !important;
-   padding:25px 25px !important;
-   font-weight: 400!important;
-   font-size: 1.1rem;
-   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
-   transition: all 0.3s ease !important;background-color: #e3f2fd !important;
+.get-started-btn-blog {
+    display: inline-flex !important;
+    flex-direction: row-reverse !important;
+    gap: 0.5rem !important;
+    cursor: pointer;
+    background: white !important;
+    color: #6528F7;
+    border: none !important;
+    border-radius: 5px !important;
+    padding:25px 25px !important;
+    font-weight: 400!important;
+    font-size: 1.1rem;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3) !important;
+    transition: all 0.3s ease !important;
 }
 
 .get-started-btn-blog:hover {
