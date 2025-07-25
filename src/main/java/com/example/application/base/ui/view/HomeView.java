@@ -42,6 +42,8 @@ public class HomeView extends VerticalLayout {
         add(createDashboardPreview());
 
         add(createAboutUsSection());
+
+        add(createBlogSection());
     }
 
     private HorizontalLayout createHeader() {
@@ -87,6 +89,9 @@ public class HomeView extends VerticalLayout {
         serviceBtn.addClassName("navigation-btn");
 
         Button getStartedBtn = new Button("Get Started");
+        getStartedBtn.addClickListener(e -> {
+            getStartedBtn.getUI().ifPresent(ui -> ui.navigate("ordering"));
+        });
         getStartedBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         getStartedBtn.addClassName("get-started-btn");
 
@@ -116,11 +121,14 @@ public class HomeView extends VerticalLayout {
         subtitle.addClassName("subtitle");
 
         // CTA Button
-        Button ctaButton = new Button("Get Started", new Icon(VaadinIcon.ARROW_RIGHT));
-        ctaButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
-        ctaButton.addClassName("get-started-btn");
+        Button getStartedBtn = new Button("Get Started", new Icon(VaadinIcon.ARROW_RIGHT));
+        getStartedBtn.addClickListener(e -> {
+            getStartedBtn.getUI().ifPresent(ui -> ui.navigate("ordering"));
+        });
+        getStartedBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
+        getStartedBtn.addClassName("get-started-btn");
 
-        hero.add(title, subtitle, ctaButton);
+        hero.add(title, subtitle, getStartedBtn);
         return hero;
     }
 
@@ -191,5 +199,76 @@ public class HomeView extends VerticalLayout {
         aboutUsSection.add(twoColumnLayout);
 
         return aboutUsSection;
+    }
+
+    private VerticalLayout createBlogSection() {
+        // Main container
+        VerticalLayout blogSection = new VerticalLayout();
+        blogSection.setWidthFull();
+
+        // Upper frame with blue background
+        VerticalLayout frameUp = new VerticalLayout();
+        frameUp.addClassName("blog-frame-up");
+        frameUp.setHeight("400px");
+        frameUp.setWidth("100%"); // Ubah dari "auto" ke "100%"
+        frameUp.getStyle().set("background", "linear-gradient(to right, #1e88e5, #0d47a1)");
+        frameUp.setPadding(false); // Ubah ke false
+        frameUp.setSpacing(false);
+        frameUp.setAlignItems(Alignment.CENTER);
+        frameUp.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        // Kontainer untuk konten agar lebih mudah diatur
+        VerticalLayout contentContainer = new VerticalLayout();
+        contentContainer.setPadding(true);
+        contentContainer.setSpacing(false);
+        contentContainer.setAlignItems(Alignment.CENTER);
+        contentContainer.setJustifyContentMode(JustifyContentMode.CENTER);
+        contentContainer.getStyle().set("max-width", "600px");
+
+        // Judul dengan line break
+        Div title = new Div();
+        title.add(new Span("Maximize What Your School"));
+        title.add(new Html("<br>"));
+        title.add(new Span("Offers-One Article at a Time"));
+        title.addClassName("title-blog");
+
+        // Paragraf
+        Paragraph paragraph = new Paragraph("Explore practical guides, smart tips, and inspiring stories to help you make the most of your school's resources.");
+        paragraph.getStyle()
+                .set("color", "white")
+                .set("text-align", "center")
+                .set("margin", "1rem 0");
+
+        // Button
+        Button getStartedBtn = new Button("Get Started", new Icon(VaadinIcon.ARROW_RIGHT));
+        getStartedBtn.addClickListener(e -> {
+            getStartedBtn.getUI().ifPresent(ui -> ui.navigate("ordering"));
+        });
+        getStartedBtn.addClassName("get-started-button-blog");
+
+        contentContainer.add(title, paragraph, getStartedBtn);
+        frameUp.add(contentContainer);
+
+        // Lower section with just image and text
+        HorizontalLayout lowerSection = new HorizontalLayout();
+        lowerSection.setWidthFull();
+        lowerSection.getStyle().set("background", "#fff");
+        lowerSection.addClassName("lower-section");
+        lowerSection.setAlignItems(Alignment.CENTER);
+        lowerSection.setJustifyContentMode(JustifyContentMode.BETWEEN);
+
+        // Image on the left
+        Image blogImage = new Image(DownloadHandler.forClassResource(getClass(),"/images/logo24Assets.png"), "Logo 24 Assets"); // Replace with your image path
+        blogImage.setHeight("100px");
+        blogImage.getStyle().set("margin-left", "2rem");
+
+        // Text on the right
+        Html footerText = new Html("<h1>Empowering Schools with<br>Smarter Access</h1>");
+        footerText.addClassName("footer-text");
+
+        lowerSection.add(blogImage, footerText);
+
+        blogSection.add(frameUp, lowerSection);
+        return blogSection;
     }
 }
