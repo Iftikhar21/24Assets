@@ -1,14 +1,15 @@
 package com.example.application.base.ui.view;
 
 import com.example.application.base.ui.component.ViewToolbar;
+import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.*;
@@ -17,13 +18,12 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.AbstractStreamResource;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import jakarta.annotation.security.PermitAll;
 
@@ -35,6 +35,9 @@ import java.util.List;
 @Route("")
 @PermitAll
 public final class MainView extends Div {
+
+    private Component desktopLayout;
+    private Component mobileLayout;
 
     // Asset data class
     public static class Asset {
@@ -91,11 +94,29 @@ public final class MainView extends Div {
                 .set("padding", "0")
                 .set("margin", "0");
 
-        add(createLayout());
+        desktopLayout = createDesktopLayout();
+        mobileLayout = createMobileLayout();
+
+        desktopLayout.setVisible(true);
+        mobileLayout.setVisible(false);
+
+        add(desktopLayout, mobileLayout);
+
+        UI.getCurrent().getPage().executeJs(
+            "if (window.innerWidth < 768) $0.$server.onMobile();",
+            getElement()
+        );
     }
 
-    private Component createLayout() {
+    @ClientCallable
+    public void onMobile() {
+        desktopLayout.setVisible(false);
+        mobileLayout.setVisible(true);
+    }
+
+    private Component createDesktopLayout() {
         HorizontalLayout mainLayout = new HorizontalLayout();
+        mainLayout.setId("desktop-layout");
         mainLayout.setSizeFull();
         mainLayout.setPadding(false);
         mainLayout.setSpacing(false);
@@ -174,64 +195,44 @@ public final class MainView extends Div {
         nameField.setWidthFull();
 
         // Row 1: Status, Grade, Class, Location
-        HorizontalLayout row1 = new HorizontalLayout();
-        row1.setWidthFull();
-        row1.setSpacing(true);
+        FormLayout row1 = new FormLayout();
 
         ComboBox<String> statusCombo = new ComboBox<>("Status");
         statusCombo.setItems("All", "Available", "In Use", "Returned");
         statusCombo.setValue("All");
-        statusCombo.setWidth("125px");
 
         ComboBox<String> gradeCombo = new ComboBox<>("Grade");
         gradeCombo.setItems("A", "B", "C", "D");
-        gradeCombo.setWidth("125px");
 
         ComboBox<String> classCombo = new ComboBox<>("Class");
         classCombo.setItems("Electronics", "Furniture", "Vehicles");
-        classCombo.setWidth("125px");
 
         ComboBox<String> locationCombo = new ComboBox<>("Location");
         locationCombo.setItems("Room 101", "Room 102", "Storage");
-        locationCombo.setWidth("125px");
 
         row1.add(statusCombo, gradeCombo, classCombo, locationCombo);
 
+        row1.setResponsiveSteps(
+            new FormLayout.ResponsiveStep("0", 1),
+            new FormLayout.ResponsiveStep("600px", 4)
+        );
+
         // Row 2: Date Time Pickers
-        HorizontalLayout row2 = new HorizontalLayout();
-        row2.setWidthFull();
-        row2.setSpacing(true);
+        FormLayout row2 = new FormLayout();
+        row2.setResponsiveSteps(
+            new FormLayout.ResponsiveStep("0", 1),
+            new FormLayout.ResponsiveStep("600px", 2)
+        );
 
-        // Custom date time layout
-        VerticalLayout startDateSection = new VerticalLayout();
-        startDateSection.setPadding(false);
-        startDateSection.setSpacing(false);
-
-        DateTimePicker startDateField = new DateTimePicker();
-        startDateField.setWidth("250px");
+        DateTimePicker startDateField = new DateTimePicker("Start Date");
+        startDateField.setWidthFull();
         startDateField.getStyle().set("font-size", "12px");
 
-        HorizontalLayout startDateTime = new HorizontalLayout(startDateField);
-        startDateTime.setSpacing(true);
-        startDateTime.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        Icon angleDoubleRight = new Icon(VaadinIcon.ANGLE_DOUBLE_RIGHT);
-        angleDoubleRight.setSize("16px");
-        angleDoubleRight.getStyle().set("color", "#6c757d");
-
-        startDateTime.add(angleDoubleRight);
-
-        // End date time
-        DateTimePicker endDateField = new DateTimePicker();
-        endDateField.setWidth("250px");
+        DateTimePicker endDateField = new DateTimePicker("End Date");
+        endDateField.setWidthFull();
         endDateField.getStyle().set("font-size", "12px");
 
-
-        HorizontalLayout endDateTime = new HorizontalLayout(endDateField);
-        endDateTime.setSpacing(true);
-        endDateTime.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        row2.add(startDateTime, endDateTime);
+        row2.add(startDateField, endDateField);
 
         // Note field
         TextArea noteField = new TextArea("Note");
@@ -681,6 +682,43 @@ public final class MainView extends Div {
 
         bottom.add(qtySection, submitBtn);
         return bottom;
+    }
+
+    private Component createMobileLayout() {
+        Tabs tabs = new Tabs();
+        Tab formTab = new Tab("Form Peminjaman");
+        Tab barangTab = new Tab("Ketersediaan Barang");
+
+        tabs.add(formTab, barangTab);
+
+        formTab.getElement().getStyle().set("flex", "1");
+        barangTab.getElement().getStyle().set("flex", "1");
+
+        var form = new VerticalLayout();
+        form.setHeightFull();
+        form.add(createFormSection());
+        form.add(goodSection());
+
+        var pemakaian = new VerticalLayout();
+        pemakaian.setHeightFull();
+        pemakaian.add(createHistorySection());
+
+        Div content = new Div(form);
+        content.setWidth("100%");
+
+        tabs.addSelectedChangeListener(event -> {
+            content.removeAll();
+            switch (event.getSelectedTab().getLabel()) {
+                case "Form Peminjaman" -> content.add(form);
+                case "Ketersediaan Barang" -> content.add(pemakaian);
+            }
+        });
+
+        VerticalLayout mainLayout = new VerticalLayout();
+        mainLayout.setSpacing(false);
+        mainLayout.add(tabs, content);
+
+        return mainLayout;
     }
 
     public static void showMainView() {
