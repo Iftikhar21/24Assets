@@ -94,7 +94,7 @@ class DevLoginView extends Main implements BeforeEnterObserver {
     public void beforeEnter(BeforeEnterEvent event) {
         if (authenticationContext.isAuthenticated()) {
             // Redirect to the main view if the user is already logged in. This makes impersonation easier to work with.
-            event.forwardTo("");
+            event.forwardTo("home");
             return;
         }
 
