@@ -1,16 +1,17 @@
 package com.example.application.base.ui.view;
 
 import com.example.application.base.ui.component.ViewToolbar;
+import com.example.application.controller.AssetController;
+import com.example.application.controller.LocationController;
 import com.example.application.controller.ProductsController;
+import com.example.application.model.Location;
 import com.example.application.model.Products;
-import com.vaadin.flow.component.ClientCallable;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -25,18 +26,18 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.AbstractStreamResource;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import jakarta.annotation.security.PermitAll;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @StyleSheet("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@400;500;600;700&display=swap")
@@ -47,6 +48,23 @@ public final class MainView extends Div {
 
     private Component desktopLayout;
     private Component mobileLayout;
+
+    private ProductsController productsController = new ProductsController();
+    private LocationController locationController = new LocationController();
+    private AssetController assetController = new AssetController();
+
+    private TextField nameField;
+    private ComboBox<String> statusCombo;
+    private ComboBox<String> gradeCombo;
+    private ComboBox<String> classCombo;
+    private ComboBox<Location> locationCombo;
+    private DateTimePicker startDateField;
+    private DateTimePicker endDateField;
+    private TextArea noteField;
+
+    private Location selectedLocation;
+
+    private List<SelectedProduct> selectedProducts = new ArrayList<>();
 
     // Asset data class
     public static class Asset {
@@ -85,6 +103,51 @@ public final class MainView extends Div {
         public void setAction(String action) { this.action = action; }
     }
 
+    // SelectedProduct data class
+    public static class SelectedProduct {
+        private String id;
+        private String name;
+        private String category;
+        private String status;
+        private int stock;
+        private IntegerField qtyField;
+        private Checkbox checkbox;
+
+        private Products product;
+
+        public Products getProduct() {
+            return product;
+        }
+
+        public SelectedProduct(String id, String name, String category, String status, int stock, Checkbox checkbox, IntegerField qtyField) {
+            this.id = id;
+            this.name = name;
+            this.category = category;
+            this.status = status;
+            this.stock = stock;
+            this.checkbox = checkbox;
+            this.qtyField = qtyField;
+
+            product = new Products(Integer.valueOf(id), 0, name, category, 0, qtyField.getValue());
+        }
+
+        public boolean isSelected() {
+            return checkbox.getValue();
+        }
+
+        public int getQty() {
+            Integer value = qtyField.getValue();
+            return value != null ? value : 0;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        // Tambahkan getter lain kalau perlu
+    }
+
+
     public MainView() {
         addClassName("main-view");
         Image logo24Assets = new Image(DownloadHandler.forClassResource(getClass(),"/images/logo24Assets.png"), "Logo 24 Assets");
@@ -103,24 +166,17 @@ public final class MainView extends Div {
                 .set("padding", "0")
                 .set("margin", "0");
 
-        desktopLayout = createDesktopLayout();
-        mobileLayout = createMobileLayout();
-
-        desktopLayout.setVisible(true);
-        mobileLayout.setVisible(false);
-
-        add(desktopLayout, mobileLayout);
-
-        UI.getCurrent().getPage().executeJs(
-            "if (window.innerWidth < 768) $0.$server.onMobile();",
-            getElement()
-        );
+        Component layout = isMobileView() ? createMobileLayout() : createDesktopLayout();
+        add(toolbar, layout);
     }
 
-    @ClientCallable
-    public void onMobile() {
-        desktopLayout.setVisible(false);
-        mobileLayout.setVisible(true);
+    private boolean isMobileView() {
+        AtomicBoolean isMobile = new AtomicBoolean(false);
+        UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
+            isMobile.set(details.getScreenWidth() <= 768);
+        });
+
+        return isMobile.get();
     }
 
     private Component createDesktopLayout() {
@@ -199,36 +255,41 @@ public final class MainView extends Div {
                 .set("box-shadow", "0 2px 4px rgba(0,0,0,0.1)");
 
         // Name field
-        TextField nameField = new TextField("Name");
+        nameField = new TextField("Name");
         nameField.addClassName("custom-textfield");
         nameField.setWidthFull();
 
         // Row 1: Status, Grade, Class, Location
         FormLayout row1 = new FormLayout();
 
-        ComboBox<String> statusCombo = new ComboBox<>("Status");
-        statusCombo.setItems("All", "Available", "In Use", "Returned");
+        statusCombo = new ComboBox<>("Status");
+        statusCombo.setItems("Siswa", "Guru", "Lainnya");
         statusCombo.setValue("All");
         statusCombo.setWidth("125px");
         statusCombo.addClassName("custom-textfield");
 
-        ComboBox<String> gradeCombo = new ComboBox<>("Grade");
+        gradeCombo = new ComboBox<>("Grade");
         gradeCombo.setItems("A", "B", "C", "D");
         gradeCombo.setValue("Grade");
         gradeCombo.setWidth("125px");
         gradeCombo.addClassName("custom-textfield");
 
-        ComboBox<String> classCombo = new ComboBox<>("Class");
+        classCombo = new ComboBox<>("Class");
         classCombo.setItems("Electronics", "Furniture", "Vehicles");
         classCombo.setValue("Class");
         classCombo.setWidth("125px");
         classCombo.addClassName("custom-textfield");
 
-        ComboBox<String> locationCombo = new ComboBox<>("Location");
-        locationCombo.setItems("Room 101", "Room 102", "Storage");
-        locationCombo.setValue("Location");
+        locationCombo = new ComboBox<>("Location");
+        var listLocations = locationController.getListLocations();
+        locationCombo.setItems(listLocations);
+        locationCombo.setItemLabelGenerator(Location::getLocationName);
         locationCombo.setWidth("125px");
         locationCombo.addClassName("custom-textfield");
+
+        locationCombo.addValueChangeListener(event -> {
+            selectedLocation = event.getValue();
+        });
 
         row1.add(statusCombo, gradeCombo, classCombo, locationCombo);
 
@@ -250,7 +311,7 @@ public final class MainView extends Div {
         startDateSection.setSpacing(false);
         startDateSection.addClassName("custom-textfield");
 
-        DateTimePicker startDateField = new DateTimePicker();
+        startDateField = new DateTimePicker();
         startDateField.addClassName("custom-textfield");
         startDateField.setWidth("250px");
         startDateField.getStyle().set("font-size", "12px");
@@ -267,7 +328,7 @@ public final class MainView extends Div {
         startDateTime.add(angleDoubleRight);
 
         // End date time
-        DateTimePicker endDateField = new DateTimePicker();
+        endDateField = new DateTimePicker();
         endDateField.setWidth("250px");
         endDateField.addClassName("custom-textfield");
         endDateField.getStyle().set("font-size", "12px");
@@ -275,7 +336,7 @@ public final class MainView extends Div {
         row2.add(startDateField, endDateField);
 
         // Note field
-        TextArea noteField = new TextArea("Note");
+        noteField = new TextArea("Note");
         noteField.addClassName("custom-textfield");
         noteField.setWidthFull();
 
@@ -319,32 +380,30 @@ public final class MainView extends Div {
         // Search field
         TextField historySearch = new TextField();
         historySearch.setPlaceholder("Search goods");
-        historySearch.addClassName("custom-textfield");
         historySearch.setPrefixComponent(new Icon(VaadinIcon.SEARCH));
-        historySearch.getStyle()
-                .set("margin", "0")
-                .set("padding-right", "10px");
+        historySearch.setWidthFull();
 
-        // Sort Button (with icon and text)
-        Icon sortIconDown = new Icon(VaadinIcon.ARROW_LONG_DOWN);
-        Button sortBtn = new Button("Sort by", sortIconDown);
-        sortBtn.addClassName("custom-button");
+        Button sortBtn = new Button("Sort by", new Icon(VaadinIcon.ARROW_LONG_DOWN));
         sortBtn.setHeight("50px");
         sortBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        // Filter Button (with icon and text)
         Button filterBtn = new Button("Filter", new Icon(VaadinIcon.ALIGN_CENTER));
-        filterBtn.addClassNames("custom-button");
         filterBtn.setHeight("50px");
         filterBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 
-        // Container untuk semua komponen dalam satu baris
-        HorizontalLayout container = new HorizontalLayout();
+        HorizontalLayout bottomRow = new HorizontalLayout(sortBtn, filterBtn);
+        bottomRow.setJustifyContentMode(FlexComponent.JustifyContentMode.START);
+        bottomRow.setSpacing(true);
+
+        VerticalLayout container = new VerticalLayout();
+        container.add(historySearch);
+        container.add(bottomRow);
+        container.setPadding(false);
+        container.setSpacing(true);
         container.setWidthFull();
-        container.setAlignItems(FlexComponent.Alignment.CENTER);
-        container.setSpacing(false);
-        container.addAndExpand(historySearch);  // Search field mengambil sisa ruang
-        container.add(sortBtn, filterBtn);     // Tombol di sebelah kanan
+
+        container.addClassName("search-filter-container");
+
 
         Grid<Asset> historyGrid = createHistoryGrid();
 
@@ -413,12 +472,12 @@ public final class MainView extends Div {
 
         // Sample data
         List<Asset> assets = Arrays.asList(
-                new Asset("📦", "Speaker", "#A0001", LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(1), "Finished", "Continue"),
-                new Asset("📦", "Monitor", "#B0001", LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(2), "In use", "Continue"),
-                new Asset("📦", "Tab", "#C0001", LocalDateTime.now().minusMinutes(30), LocalDateTime.now().plusHours(3), "In use", "Continue"),
-                new Asset("📦", "Projector", "#D0001", LocalDateTime.now().minusHours(3), LocalDateTime.now().plusHours(1), "Finished", "Continue"),
-                new Asset("📦", "Projector", "#E0001", LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(2), "In use", "Continue"),
-                new Asset("📦", "Monitor", "#F0001", LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(4), "In use", "Continue")
+            new Asset("📦", "Speaker", "#A0001", LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(1), "Finished", "Continue"),
+            new Asset("📦", "Monitor", "#B0001", LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(2), "In use", "Continue"),
+            new Asset("📦", "Tab", "#C0001", LocalDateTime.now().minusMinutes(30), LocalDateTime.now().plusHours(3), "In use", "Continue"),
+            new Asset("📦", "Projector", "#D0001", LocalDateTime.now().minusHours(3), LocalDateTime.now().plusHours(1), "Finished", "Continue"),
+            new Asset("📦", "Projector", "#E0001", LocalDateTime.now().minusHours(2), LocalDateTime.now().plusHours(2), "In use", "Continue"),
+            new Asset("📦", "Monitor", "#F0001", LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(4), "In use", "Continue")
         );
 
         grid.setItems(assets);
@@ -600,8 +659,6 @@ public final class MainView extends Div {
                 .set("max-height", "575px") // Set max height for scrollable area
                 .set("margin-bottom", "16px");
 
-        // Get products data from controller
-        ProductsController productsController = new ProductsController();
         List<Products> allProducts = productsController.getListProducts("");
 
         // Group products by category
@@ -616,10 +673,12 @@ public final class MainView extends Div {
             // Convert Products to VerticalLayout cards
             List<VerticalLayout> productCards = categoryProducts.stream()
                     .map(product -> createProductCard(
+                            product.getProductID().toString(),
                             product.getProductName(),
                             product.getCategoryName(),
                             product.getStock() > 0 ? "Ready" : "Unavailable", // status
-                            product.getStock())) // stock
+                            product.getStock(), // stock
+                            selectedProducts))
                     .collect(Collectors.toList());
 
             // Create category section
@@ -660,7 +719,7 @@ public final class MainView extends Div {
         return section;
     }
 
-    private VerticalLayout createProductCard(String name, String category, String status, int stock) {
+    private VerticalLayout createProductCard(String id, String name, String category, String status, int stock, List<SelectedProduct> selectionTracker) {
         VerticalLayout card = new VerticalLayout();
         card.setPadding(true);
         card.setSpacing(false);
@@ -678,10 +737,12 @@ public final class MainView extends Div {
 
         // Checkbox pojok kanan bawah
         Checkbox checkbox = new Checkbox();
-        checkbox.getStyle()
-                .set("position", "absolute")
-                .set("bottom", "12px")
-                .set("right", "12px");
+
+        // Quantity selector
+        HorizontalLayout qtySection = new HorizontalLayout();
+        qtySection.setVisible(false);
+        qtySection.setAlignItems(FlexComponent.Alignment.CENTER);
+        qtySection.setSpacing(true);
 
         // Highlight card saat dicentang
         checkbox.addValueChangeListener(event -> {
@@ -690,7 +751,32 @@ public final class MainView extends Div {
             } else {
                 card.getStyle().set("border", "2px solid #e9ecef"); // default
             }
+            qtySection.setVisible(event.getValue());
         });
+        checkbox.getElement().executeJs(
+            "this.addEventListener('click', function(e) { e.stopPropagation(); });"
+        );
+
+        Span qtyLabel = new Span("Qty");
+        qtyLabel.getStyle().set("font-size", "14px");
+
+        IntegerField qtyCombo = new IntegerField();
+        qtyCombo.setStepButtonsVisible(true);
+        qtyCombo.setRequiredIndicatorVisible(true);
+        qtyCombo.setMin(1);
+        qtyCombo.setWidth("100px");
+        qtyCombo.getElement().executeJs(
+            "this.addEventListener('click', function(e) { e.stopPropagation(); });"
+        );
+
+        qtySection.add(qtyLabel, qtyCombo);
+
+        HorizontalLayout bottomSection = new HorizontalLayout();
+        bottomSection.setWidthFull();
+        bottomSection.setJustifyContentMode(FlexComponent.JustifyContentMode.END);
+        bottomSection.setAlignItems(FlexComponent.Alignment.CENTER);
+        bottomSection.getStyle().set("margin-top", "20px");
+        bottomSection.add(qtySection, checkbox);
 
         // Gambar produk
         Image productImage = new Image(DownloadHandler.forClassResource(getClass(), "/images/speaker.png"), "Product Image");
@@ -699,11 +785,16 @@ public final class MainView extends Div {
 
         // Nama produk
         Span nameSpan = new Span(name);
+        nameSpan.getElement().setProperty("title", name);
         nameSpan.getStyle()
                 .set("font-weight", "600")
                 .set("font-size", "16px")
                 .set("color", "#111827")
-                .set("margin-bottom", "4px");
+                .set("margin-bottom", "4px")
+                .set("max-width", "100%")
+                .set("overflow", "hidden")
+                .set("white-space", "nowrap")
+                .set("text-overflow", "ellipsis");
 
         // Status badge
         Span statusBadge = new Span(status);
@@ -717,6 +808,7 @@ public final class MainView extends Div {
 
         // Nama produk + status
         HorizontalLayout nameAndStatus = new HorizontalLayout(nameSpan, statusBadge);
+        nameAndStatus.setMaxWidth("100%");
         nameAndStatus.setSpacing(true);
         nameAndStatus.setAlignItems(FlexComponent.Alignment.BASELINE);
 
@@ -743,10 +835,13 @@ public final class MainView extends Div {
         content.setSpacing(false);
         content.setPadding(false);
 
-        card.add(content, checkbox);
+        card.add(content, bottomSection);
         card.addClickListener(event -> {
             checkbox.setValue(!checkbox.getValue());
         });
+
+        selectionTracker.add(new SelectedProduct(id, name, category, status, stock, checkbox, qtyCombo));
+
         return card;
     }
 
@@ -759,31 +854,36 @@ public final class MainView extends Div {
         bottom.setAlignItems(FlexComponent.Alignment.CENTER);
         bottom.getStyle().set("margin-top", "20px");
 
-        // Quantity selector
-        HorizontalLayout qtySection = new HorizontalLayout();
-        qtySection.setAlignItems(FlexComponent.Alignment.CENTER);
-        qtySection.setSpacing(true);
-
-        Span qtyLabel = new Span("Qty");
-        qtyLabel.getStyle().set("font-size", "14px");
-
-        IntegerField qtyCombo = new IntegerField();
-        qtyCombo.setStepButtonsVisible(true);
-        qtyCombo.setRequiredIndicatorVisible(true);
-        qtyCombo.setMin(0);
-        qtyCombo.setWidth("100px");
-
-        qtySection.add(qtyLabel, qtyCombo);
-
         // Submit button
         Button submitBtn = new Button("Submit");
+        submitBtn.addClickListener(event -> {
+            Products[] productArray = selectedProducts.stream()
+                .filter(SelectedProduct::isSelected)
+                .map(selected -> {
+                    Products p = selected.getProduct();
+                    p.setQuantity(selected.getQty());
+                    return p;
+                })
+                .toArray(Products[]::new);
+
+            for (Products selectedProduct : productArray) {
+                System.out.println("Produk " + selectedProduct.getProductName() + " dipilih.");
+            }
+            System.out.println(nameField.getValue());
+            com.example.application.model.Asset submitedAsset = new com.example.application.model.Asset(
+                "0", startDateField.getValue(), endDateField.getValue(), "",
+                "0", noteField.getValue(), selectedLocation, productArray, statusCombo.getValue(), nameField.getValue(), classCombo.getValue()
+            );
+
+            assetController.InsertAsset(submitedAsset);
+        });
         submitBtn.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         submitBtn.getStyle()
                 .set("background-color", "#7c3aed")
                 .set("border-radius", "8px")
                 .set("padding", "10px 24px");
 
-        bottom.add(qtySection, submitBtn);
+        bottom.add(submitBtn);
         return bottom;
     }
 
