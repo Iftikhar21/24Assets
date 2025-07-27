@@ -69,4 +69,29 @@
   background-color: #e2e8f0;
 }
 
+.search-filter-container {
+    gap: 0.5rem;
+}
+
+.search-filter-container .vaadin-horizontal-layout {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media (min-width: 600px) {
+    .search-filter-container {
+        flex-direction: row;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-filter-container > .vaadin-text-field {
+        flex-grow: 1;
+    }
+
+    .search-filter-container > .vaadin-horizontal-layout {
+        flex-grow: 0;
+    }
+}
+
 css

@@ -7,6 +7,19 @@ public class Products {
     private String categoryName;
     private Integer stock;
 
+    private Integer quantity;
+
+    public Products(Integer productID, Integer categoryID, String productName, String categoryName, Integer stock, Integer quantity) {
+        this.productID = productID;
+        this.categoryID = categoryID;
+        this.productName = productName;
+        this.categoryName = categoryName;
+        this.stock = stock;
+        this.quantity = quantity;
+    }
+
+    public Products() {}
+
     public Integer getProductID() {
         return productID;
     }
@@ -45,5 +58,13 @@ public class Products {
 
     public void setStock(Integer stock) {
         this.stock = stock;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }
