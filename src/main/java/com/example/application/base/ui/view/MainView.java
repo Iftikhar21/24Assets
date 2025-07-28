@@ -37,7 +37,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @StyleSheet("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:wght@400;500;600;700&display=swap")
@@ -166,17 +168,17 @@ public final class MainView extends Div {
                 .set("padding", "0")
                 .set("margin", "0");
 
-        Component layout = isMobileView() ? createMobileLayout() : createDesktopLayout();
-        add(toolbar, layout);
+        buildLayoutBasedOnDevice(layout -> {
+            add(toolbar, layout);
+        });
     }
 
-    private boolean isMobileView() {
-        AtomicBoolean isMobile = new AtomicBoolean(false);
+    private void buildLayoutBasedOnDevice(Consumer<Component> layoutConsumer) {
         UI.getCurrent().getPage().retrieveExtendedClientDetails(details -> {
-            isMobile.set(details.getScreenWidth() <= 768);
+            boolean isMobile = details.getScreenWidth() <= 768;
+            Component layout = isMobile ? createMobileLayout() : createDesktopLayout();
+            layoutConsumer.accept(layout);
         });
-
-        return isMobile.get();
     }
 
     private Component createDesktopLayout() {
